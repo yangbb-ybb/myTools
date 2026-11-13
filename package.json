@@ -1,0 +1,84 @@
+{
+  "name": "toolbox-desktop",
+  "version": "0.1.0",
+  "description": "A focused offline toolbox for everyday file and text utilities.",
+  "main": "dist-electron/main.js",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && env -u ELECTRON_RUN_AS_NODE electron . --dev\"",
+    "prepare:7zip": "chmod +x node_modules/7zip-bin/mac/*/7za node_modules/7zip-bin/linux/*/7za 2>/dev/null || true",
+    "build": "npm run prepare:7zip && npm run build:web && npm run build:electron",
+    "build:web": "tsc --noEmit && vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
+    "preview": "vite preview",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:win:arm64": "npm run build && electron-builder --win --arm64",
+    "dist:mac": "npm run build && electron-builder --mac --arm64",
+    "dist:mac:x64": "npm run build && electron-builder --mac --x64",
+    "dist:mac:dmg": "npm run build && electron-builder --mac dmg --arm64",
+    "dist:mac:all": "npm run build && electron-builder --mac --x64 --arm64",
+    "dist:all": "npm run build && electron-builder --win --x64 --mac --arm64",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "7zip-bin": "^5.2.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "concurrently": "^9.2.1",
+    "electron": "^39.2.4",
+    "electron-builder": "^26.0.12",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.8",
+    "wait-on": "^9.0.1"
+  },
+  "build": {
+    "directories": {
+      "output": "release"
+    },
+    "appId": "com.toolbox.desktop",
+    "productName": "Toolbox",
+    "asar": true,
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "vendor/7zip",
+        "to": "7zip",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "target": [
+        "zip"
+      ],
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  }
+}
