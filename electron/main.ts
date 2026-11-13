@@ -64,8 +64,9 @@ function friendlyArchiveError(stderr: string) {
   if (text.includes('password') || text.includes('encrypted')) return '此 RAR 需要密码，首版暂不支持加密压缩包。'
   if (text.includes('volumes') || text.includes('multipart')) return '首版暂不支持分卷 RAR，请选择完整的单文件压缩包。'
   if (text.includes('cannot open') || text.includes('not found')) return '无法打开该 RAR 文件，请确认文件完整且有访问权限。'
-  if (text.includes('not implemented') || text.includes('unsupported method') || text.includes('can not open the file as archive')) return '当前内置解包组件不支持该 RAR 格式，可能是新版 RAR5，请更新 7-Zip 组件后重试。'
-  return 'RAR 转换失败：当前内置解包组件版本不支持该 RAR 格式（可能是 RAR5），请使用新版 7-Zip 组件后重试。'
+  if (text.includes('unsupported -spf') || text.includes('command line error')) return '解包参数不兼容，已自动使用兼容模式重试。'
+  if (text.includes('not implemented') || text.includes('unsupported method') || text.includes('can not open the file as archive')) return '当前解包组件不支持该 RAR 格式或压缩算法，请确认文件可由最新版 7-Zip 打开。'
+  return `RAR 转换失败：${stderr.trim().split(/\\r?\\n/).filter(Boolean).slice(-1)[0] ?? '解包组件无法读取该文件。'}`
 }
 
 ipcMain.handle('archive:select', async () => {
@@ -89,7 +90,7 @@ ipcMain.handle('archive:convert', async (_event, inputPath: unknown, outputPath:
     const workingDir = await mkdtemp(join(tmpdir(), 'toolbox-rar-'))
     const extractionDir = join(workingDir, 'extracted')
     try {
-      const extract = await runCommand(sidecar, ['x', inputPath, `-o${extractionDir}`, '-y', '-spf-'])
+      const extract = await runCommand(sidecar, ['x', inputPath, `-o${extractionDir}`, '-y'])
       if (extract.code !== 0) return { ok: false, error: friendlyArchiveError(extract.stderr || extract.stdout) }
       const zip = await runCommand(sidecar, ['a', '-tzip', outputPath, extractionDir, '-r', '-y'])
       if (zip.code !== 0) return { ok: false, error: friendlyArchiveError(zip.stderr || zip.stdout) }
