@@ -5,7 +5,7 @@ import type { ToolDefinition } from '../data'
 import { transformUrl, type UrlMode } from '../lib/url'
 
 export function UrlEncodePage({ tool, onBack }: { tool: ToolDefinition; onBack: () => void }) {
-  const [input, setInput] = useState('https://example.com/search?q=工具箱&lang=中文')
+  const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [mode, setMode] = useState<UrlMode>('component')
   const [error, setError] = useState('')

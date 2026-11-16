@@ -7,7 +7,7 @@ import type { ToolDefinition } from '../data'
 import { isHttpUrl } from '../lib/url'
 
 export function QrCodePage({ tool, onBack }: { tool: ToolDefinition; onBack: () => void }) {
-  const [value, setValue] = useState('https://example.com/hello?from=toolbox')
+  const [value, setValue] = useState('')
   const [qr, setQr] = useState('')
   const [error, setError] = useState('')
   const canvasRef = useRef<HTMLCanvasElement>(null)

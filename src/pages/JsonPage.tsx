@@ -5,10 +5,8 @@ import { ToolLayout } from '../components/ToolLayout'
 import type { ToolDefinition } from '../data'
 import { formatJson, minifyJson } from '../lib/json'
 
-const sample = '{\n  "name": "Toolbox",\n  "features": ["二维码", "JSON 格式化"],\n  "offline": true\n}'
-
 export function JsonPage({ tool, onBack }: { tool: ToolDefinition; onBack: () => void }) {
-  const [input, setInput] = useState(sample)
+  const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [error, setError] = useState('')
   const [indent, setIndent] = useState<number | string>(2)
